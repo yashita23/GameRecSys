@@ -52,7 +52,7 @@ Tên cột lấy theo mô tả của các dự án dùng bộ này. **Phải ki�
 
 1. Lọc k-core lặp trên **toàn bộ** dữ liệu (chỉ đọc các cột cần, dùng polars): người dùng ≥ 10 review, game ≥ 20 review, đếm cả review thích lẫn chê; lặp đến khi không còn ai bị loại.
 2. Bốc mẫu 50–100 nghìn người dùng từ nhóm đã qua lọc, rồi lọc k-core lại một lần trên mẫu. Chỉ tăng cỡ mẫu khi mọi thứ đã chạy ổn.
-3. Tạo thêm một **mẫu nhỏ** (2–5 nghìn người dùng) chạy được trên CPU trong vài phút, dùng để kiểm tra mọi ticket trên máy cá nhân.
+3. Dữ liệu đầy đủ (2,2 GB) **chỉ nằm trên Kaggle**, không tải về máy. Để thử code trên máy, tạo một **mẫu thô thu nhỏ** trên Kaggle (khoảng 10 nghìn người dùng có ≥ 10 review, 4 file giống hệt cấu trúc file gốc, vài chục MB) rồi tải về. Cùng một code chạy trên máy với mẫu này và trên Kaggle với dữ liệu đầy đủ, chỉ khác đường dẫn và cỡ mẫu.
 4. Sắp chuỗi review theo quy tắc trên.
 5. Chuẩn hóa hours: log(1 + hours), cắt ngưỡng trên.
 6. Văn bản M3: ghép tags + description, mã hóa bằng sentence-transformers.
@@ -188,12 +188,12 @@ Thiết kế để người không chơi game (kể cả giảng viên) vẫn hi
 - RecBole (Popularity, ItemKNN, BPR, GRU4Rec, SASRec); PyTorch cho ba biến thể BPR; numpy cho M3 và hybrid; sentence-transformers; polars + parquet; Streamlit + Plotly; huấn luyện trên GPU Kaggle.
 - **Toàn bộ logic nằm trong `src/`.** Notebook Kaggle chỉ tải repo, gọi script trong `src/` và xuất file; không viết logic trong notebook.
 - **Test tự động** (pytest) cho `src/data` và `src/eval` trên một bộ dữ liệu giả rất nhỏ tính tay được. Ví dụ: không review nào sau mốc cắt lọt vào train; Recall@10 khớp với tính tay.
-- Công việc chia thành ticket trên GitHub Issues, mỗi ticket kiểm tra được trên mẫu nhỏ bằng CPU. Việc chỉ người làm được (chạy bản đầy đủ trên Kaggle, chạy 3 seed, tổng duyệt demo khi tắt mạng) là ticket riêng ghi rõ "người làm".
+- Công việc chia thành ticket trên GitHub Issues, mỗi ticket kiểm tra được trên mẫu thô thu nhỏ bằng CPU. Việc chỉ người làm được (tạo mẫu thô thu nhỏ, chạy EDA và bản đầy đủ trên Kaggle, chạy 3 seed, tổng duyệt demo khi tắt mạng) là ticket riêng ghi rõ "người làm".
 - GitHub, mỗi ticket một nhánh, merge qua pull request.
 
 ```text
 GameRecSys/
-├── data/               # raw, processed, mẫu nhỏ — không commit
+├── data/               # mẫu thô thu nhỏ, processed — không commit
 ├── configs/            # cấu hình RecBole và mô hình riêng
 ├── src/
 │   ├── data/           # lọc k-core, bốc mẫu, sắp chuỗi, thiết lập A và B, tập độ vững
@@ -235,9 +235,10 @@ Mốc: cuối tuần 1 dữ liệu và baseline chốt; cuối tuần 2 ba modul
 **Tuần 1: Dữ liệu và baseline**
 
 - [ ] Tạo venv, `requirements.txt` cố định phiên bản chạy được trên laptop và Kaggle
-- [ ] Tải dữ liệu, kiểm tra tên cột thật
-- [ ] EDA: tỷ lệ thích/chê, số người dùng có ≥ 2 review chê, phân bố giờ chơi, tỷ lệ review trùng ngày, review_id có tăng theo thời gian không, số game sau lọc
-- [ ] Lọc k-core trên toàn bộ dữ liệu, bốc mẫu 50–100k và mẫu nhỏ
+- [ ] (Người làm, Kaggle) Tạo mẫu thô thu nhỏ, tải về máy, kiểm tra tên cột thật
+- [ ] Lọc k-core, bốc mẫu, chạy được trên mẫu thô thu nhỏ và trên dữ liệu đầy đủ (Kaggle)
+- [ ] Script EDA: tỷ lệ thích/chê, số người dùng có ≥ 2 review chê, phân bố giờ chơi, tỷ lệ review trùng ngày, review_id có tăng theo thời gian không, số game sau lọc
+- [ ] (Người làm, Kaggle) Chạy EDA trên dữ liệu đầy đủ, mang con số về
 - [ ] Tạo thiết lập A (mốc cắt + test tiêu cực), thiết lập B (game bị giấu 5% + 5%), tập độ vững; xuất định dạng RecBole; có test
 - [ ] Viết src/eval: Recall, NDCG, HitRate, Neg@10, độ đa dạng; có test
 - [ ] Chạy Popularity, ItemKNN, BPR (RecBole)
