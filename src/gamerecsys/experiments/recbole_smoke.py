@@ -12,8 +12,12 @@ from __future__ import annotations
 import argparse
 import contextlib
 import random
+import sys
 import tempfile
 from pathlib import Path
+from unittest import mock
+
+import torch
 
 from gamerecsys.cli import ensure_utf8_output
 from recbole.config import Config
@@ -38,29 +42,40 @@ def _write_toy_dataset(root: Path) -> None:
     (folder / f"{DATASET}.inter").write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 
-def run(epochs: int = 2, use_gpu: bool = False) -> dict[str, float]:
-    """Huấn luyện BPR vài epoch, nạp lại checkpoint tốt nhất, trả về chỉ số trên tập test."""
+class GpuUnavailableError(RuntimeError):
+    """Yêu cầu GPU nhưng torch không thấy CUDA (trên Kaggle: chưa bật Accelerator = GPU)."""
+
+
+def run(epochs: int = 2, use_gpu: bool = False) -> tuple[dict[str, float], str]:
+    """Huấn luyện BPR vài epoch, nạp lại checkpoint tốt nhất.
+
+    Trả về (chỉ số trên tập test, thiết bị thật đã dùng).
+    """
+    if use_gpu and not torch.cuda.is_available():
+        raise GpuUnavailableError("Yêu cầu GPU nhưng torch không thấy CUDA. Trên Kaggle: Settings → Accelerator → GPU.")
     with tempfile.TemporaryDirectory() as tmp:
         tmp_path = Path(tmp)
         _write_toy_dataset(tmp_path)
-        config = Config(
-            model=BPR,
-            dataset=DATASET,
-            config_dict={
-                "data_path": str(tmp_path),
-                "checkpoint_dir": str(tmp_path / "saved"),
-                "use_gpu": use_gpu,
-                "epochs": epochs,
-                "train_batch_size": 256,
-                "eval_batch_size": 256,
-                "metrics": ["Recall", "NDCG"],
-                "topk": [10],
-                "valid_metric": "NDCG@10",
-                "show_progress": False,
-                "seed": 2026,
-                "reproducibility": True,
-            },
-        )
+        # RecBole tự đọc sys.argv làm cấu hình; giấu tham số của script này đi.
+        with mock.patch.object(sys, "argv", sys.argv[:1]):
+            config = Config(
+                model=BPR,
+                dataset=DATASET,
+                config_dict={
+                    "data_path": str(tmp_path),
+                    "checkpoint_dir": str(tmp_path / "saved"),
+                    "use_gpu": use_gpu,
+                    "epochs": epochs,
+                    "train_batch_size": 256,
+                    "eval_batch_size": 256,
+                    "metrics": ["Recall", "NDCG"],
+                    "topk": [10],
+                    "valid_metric": "NDCG@10",
+                    "show_progress": False,
+                    "seed": 2026,
+                    "reproducibility": True,
+                },
+            )
         init_seed(config["seed"], config["reproducibility"])
         # RecBole ghi log_tensorboard/ vào thư mục hiện tại, nên chạy trong thư mục tạm.
         with contextlib.chdir(tmp_path):
@@ -70,7 +85,7 @@ def run(epochs: int = 2, use_gpu: bool = False) -> dict[str, float]:
             trainer = Trainer(config, model)
             trainer.fit(train_data, valid_data, saved=True, show_progress=False)
             result = trainer.evaluate(test_data, load_best_model=True, show_progress=False)
-        return {k: float(v) for k, v in result.items()}
+        return {k: float(v) for k, v in result.items()}, str(next(model.parameters()).device)
 
 
 def main() -> None:
@@ -78,9 +93,11 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--gpu", action="store_true", help="chạy trên GPU (Kaggle)")
     args = parser.parse_args()
-    result = run(use_gpu=args.gpu)
-    device = "GPU" if args.gpu else "CPU"
-    print(f"RecBole BPR chạy thử ({device}, dữ liệu giả) OK:", {k: round(v, 4) for k, v in result.items()})
+    try:
+        result, device = run(use_gpu=args.gpu)
+    except GpuUnavailableError as err:
+        sys.exit(f"LỖI: {err}")
+    print(f"RecBole BPR chạy thử OK trên thiết bị {device} (dữ liệu giả):", {k: round(v, 4) for k, v in result.items()})
 
 
 if __name__ == "__main__":

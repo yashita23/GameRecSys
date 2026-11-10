@@ -46,7 +46,17 @@ def test_importing_package_applies_recbole_compat():
 def test_recbole_bpr_trains_and_reloads_checkpoint_on_cpu():
     from gamerecsys.experiments import recbole_smoke
 
-    result = recbole_smoke.run(epochs=2)
+    result, device = recbole_smoke.run(epochs=2)
 
+    assert device == "cpu"
     assert set(result) == {"recall@10", "ndcg@10"}
     assert all(math.isfinite(v) and 0.0 <= v <= 1.0 for v in result.values())
+
+
+def test_requesting_gpu_without_cuda_fails_loudly(monkeypatch):
+    from gamerecsys.experiments import recbole_smoke
+
+    monkeypatch.setattr(recbole_smoke.torch.cuda, "is_available", lambda: False)
+
+    with pytest.raises(recbole_smoke.GpuUnavailableError):
+        recbole_smoke.run(use_gpu=True)

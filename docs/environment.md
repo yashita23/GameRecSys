@@ -44,7 +44,10 @@ Nếu pip đổi phiên bản numpy hoặc các thư viện Kaggle đã nạp s�
 
 **Không** cài `requirements-torch-cpu.txt` trên Kaggle, vì sẽ đè mất torch GPU có sẵn.
 
-**Chưa kiểm chứng trên Kaggle.** Bộ phiên bản này mới được thử trên laptop (Windows, CPU). Có thể lệch với torch có sẵn của Kaggle (transformers và sentence-transformers mới có thể cần torch mới hơn). Lần đầu lên Kaggle phải chạy smoke test `--gpu` ở trên; nếu lỗi thì ghi lại trong issue và chỉnh file này cùng `requirements.txt`.
+**Đã thử trên Kaggle (2026-11-10).**
+- Kaggle chạy **Python 3.13**. Cài đặt thành công và smoke test chạy OK, nhưng lần đó notebook **chưa bật GPU** nên chỉ chạy trên CPU. Phần GPU vẫn chưa kiểm chứng.
+- Smoke test giờ in ra thiết bị thật, và dừng với lỗi nếu gọi `--gpu` mà không có CUDA.
+- Khi cài, pip báo `dependency conflicts` với các thư viện Kaggle có sẵn mà dự án không dùng (numba, cudf, ydata-profiling, gradio, bigframes…). Các cảnh báo này **bỏ qua được**.
 
 ## Lý do chọn phiên bản
 
