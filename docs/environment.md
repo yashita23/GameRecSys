@@ -60,4 +60,4 @@ Nếu pip đổi phiên bản numpy hoặc các thư viện Kaggle đã nạp s�
 
 ## Ghi chú Windows
 
-Console Windows mặc định (cp1258) không in được tiếng Việt. Script in ra màn hình chỉ dùng chữ ASCII, hoặc đặt `set PYTHONUTF8=1` trước khi chạy.
+Console Windows mặc định (cp1258) báo lỗi khi in tiếng Việt. Mọi lệnh `python -m gamerecsys...` gọi `gamerecsys.cli.ensure_utf8_output()` ở đầu `main()` để tránh lỗi này; lệnh mới cũng phải làm vậy.

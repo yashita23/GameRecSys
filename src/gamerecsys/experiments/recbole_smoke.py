@@ -15,6 +15,7 @@ import random
 import tempfile
 from pathlib import Path
 
+from gamerecsys.cli import ensure_utf8_output
 from recbole.config import Config
 from recbole.data import create_dataset, data_preparation
 from recbole.model.general_recommender import BPR
@@ -73,13 +74,13 @@ def run(epochs: int = 2, use_gpu: bool = False) -> dict[str, float]:
 
 
 def main() -> None:
+    ensure_utf8_output()
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--gpu", action="store_true", help="chạy trên GPU (Kaggle)")
     args = parser.parse_args()
     result = run(use_gpu=args.gpu)
-    # Chỉ in ASCII: console Windows mặc định (cp1258) không in được tiếng Việt.
     device = "GPU" if args.gpu else "CPU"
-    print(f"RecBole BPR smoke test ({device}, toy data) OK:", {k: round(v, 4) for k, v in result.items()})
+    print(f"RecBole BPR chạy thử ({device}, dữ liệu giả) OK:", {k: round(v, 4) for k, v in result.items()})
 
 
 if __name__ == "__main__":
