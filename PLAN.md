@@ -184,7 +184,7 @@ Thiết kế để người không chơi game (kể cả giảng viên) vẫn hi
 
 ## 7. Công nghệ và cấu trúc repo
 
-- Python 3.11, môi trường **venv**, thư viện ghi cố định phiên bản trong `requirements.txt` (dùng chung cho laptop và Kaggle). RecBole hay lỗi với bản mới của numpy/torch, nên việc đầu tiên là tìm bộ phiên bản chạy được ở cả hai nơi.
+- Python 3.11, môi trường **venv**, thư viện ghi cố định phiên bản trong ba file (chi tiết và lý do: [docs/environment.md](docs/environment.md)): `requirements.txt` dùng chung cho laptop và Kaggle; `requirements-torch-cpu.txt` chỉ cho laptop (Kaggle dùng torch GPU có sẵn); `requirements-recbole.txt` cài RecBole với `--no-deps` (bỏ ray). Mọi code gọi RecBole đi qua `gamerecsys.recbole_compat`.
 - RecBole (Popularity, ItemKNN, BPR, GRU4Rec, SASRec); PyTorch cho ba biến thể BPR; numpy cho M3 và hybrid; sentence-transformers; polars + parquet; Streamlit + Plotly; huấn luyện trên GPU Kaggle.
 - **Toàn bộ logic nằm trong `src/`.** Notebook Kaggle chỉ tải repo, gọi script trong `src/` và xuất file; không viết logic trong notebook.
 - **Test tự động** (pytest) cho `src/data` và `src/eval` trên một bộ dữ liệu giả rất nhỏ tính tay được. Ví dụ: không review nào sau mốc cắt lọt vào train; Recall@10 khớp với tính tay.

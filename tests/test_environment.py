@@ -29,11 +29,14 @@ def test_pandas_stays_below_3_for_recbole():
     assert int(pandas.__version__.split(".")[0]) == 2, "RecBole 1.2.1 cần pandas 2.x, xem docs/environment.md"
 
 
-def test_recbole_compat_restores_numpy_aliases():
+def test_importing_package_applies_recbole_compat():
+    import os
+
     import numpy as np
 
-    from gamerecsys import recbole_compat  # noqa: F401
+    import gamerecsys  # noqa: F401
 
+    assert os.environ["TORCH_FORCE_NO_WEIGHTS_ONLY_LOAD"] == "1"
     assert np.float_ is np.float64
     assert np.complex_ is np.complex128
     assert np.unicode_ is np.str_
@@ -46,4 +49,4 @@ def test_recbole_bpr_trains_and_reloads_checkpoint_on_cpu():
     result = recbole_smoke.run(epochs=2)
 
     assert set(result) == {"recall@10", "ndcg@10"}
-    assert all(math.isfinite(float(v)) and 0.0 <= float(v) <= 1.0 for v in result.values())
+    assert all(math.isfinite(v) and 0.0 <= v <= 1.0 for v in result.values())

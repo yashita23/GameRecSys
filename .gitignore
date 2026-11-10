@@ -234,3 +234,7 @@ app/assets/*
 saved/
 log/
 log_tensorboard/
+# Checkpoint và bảng dữ liệu lớn, ở bất kỳ đâu
+*.pt
+*.pth
+*.parquet

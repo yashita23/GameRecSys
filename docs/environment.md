@@ -31,15 +31,20 @@ Khi cài sẽ thấy pip báo `recbole 1.2.1 requires ray ... which is not insta
 
 ## Cài trên Kaggle (GPU)
 
-Trong notebook, sau khi tải repo về:
+Trong notebook, tải repo về rồi **chuyển vào thư mục repo** (vì `requirements.txt` có dòng `-e .`):
 
 ```bash
+cd GameRecSys
 pip install -r requirements.txt
 pip install --no-deps -r requirements-recbole.txt
-python -m gamerecsys.experiments.recbole_smoke
+python -m gamerecsys.experiments.recbole_smoke --gpu
 ```
 
-**Không** cài `requirements-torch-cpu.txt` trên Kaggle, vì sẽ đè mất torch GPU có sẵn. Bộ phiên bản này mới được thử trên laptop (Windows, CPU). Lần đầu chạy trên Kaggle cần chạy lệnh smoke test ở trên; nếu lỗi thì ghi lại trong issue và chỉnh file này.
+Nếu pip đổi phiên bản numpy hoặc các thư viện Kaggle đã nạp sẵn, cần **Restart kernel** rồi chạy lại lệnh smoke test.
+
+**Không** cài `requirements-torch-cpu.txt` trên Kaggle, vì sẽ đè mất torch GPU có sẵn.
+
+**Chưa kiểm chứng trên Kaggle.** Bộ phiên bản này mới được thử trên laptop (Windows, CPU). Có thể lệch với torch có sẵn của Kaggle (transformers và sentence-transformers mới có thể cần torch mới hơn). Lần đầu lên Kaggle phải chạy smoke test `--gpu` ở trên; nếu lỗi thì ghi lại trong issue và chỉnh file này cùng `requirements.txt`.
 
 ## Lý do chọn phiên bản
 
@@ -48,10 +53,10 @@ python -m gamerecsys.experiments.recbole_smoke
   - **numpy 2**: RecBole gán lại `np.float_`, `np.complex_`, `np.unicode_`, mà numpy 2 đã xoá các tên này. Module `gamerecsys.recbole_compat` trả lại các tên đó.
   - **torch >= 2.6**: `torch.load` mặc định `weights_only=True`, làm hỏng việc RecBole nạp lại checkpoint. `gamerecsys.recbole_compat` đặt biến môi trường `TORCH_FORCE_NO_WEIGHTS_ONLY_LOAD=1`. Cách này an toàn vì checkpoint chỉ do nhóm tự tạo.
 
-  **Quy tắc:** mọi code gọi RecBole phải `from gamerecsys import recbole_compat` **trước** khi import `recbole`.
+  **Quy tắc:** package `gamerecsys` tự áp bản vá khi được import, nên module trong package không cần làm gì thêm. Notebook hoặc script nằm ngoài package phải `import gamerecsys` **trước** `import recbole`.
 - **pandas 2.3.3, không lên 3.x**: pandas 3 bật copy-on-write, làm lệnh `fillna(inplace=True)` trong RecBole lặng lẽ không làm gì (giá trị thiếu không được điền). Có test chặn việc nâng nhầm lên pandas 3.
-- **torch 2.8.0** (laptop): bản CPU ổn định, chạy được với lớp tương thích ở trên. Trên Kaggle dùng bản có sẵn; lớp tương thích chạy được với mọi torch 2.x.
-- **numpy 2.4.6, polars, sentence-transformers, streamlit, plotly, pytest**: bản mới nhất lúc dựng môi trường (2026-11), đã chạy thử cùng nhau.
+- **torch 2.8.0** (laptop): bản CPU ổn định, đã chạy được cùng lớp tương thích ở trên. Trên Kaggle dùng bản có sẵn (chưa kiểm chứng, xem mục Kaggle).
+- **Các thư viện còn lại**: bản mới nhất lúc dựng môi trường (2026-11), đã cài và chạy thử cùng nhau trên laptop. Chỉ thư viện dùng trực tiếp được ghi cố định; thư viện kéo theo (huggingface-hub, tokenizers…) để pip tự chọn.
 
 ## Ghi chú Windows
 

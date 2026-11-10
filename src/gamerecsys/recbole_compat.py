@@ -1,7 +1,8 @@
 """Cho RecBole 1.2.1 chạy được với numpy 2 và torch >= 2.6.
 
-Import module này TRƯỚC mọi module ``recbole``. Mọi code trong dự án gọi RecBole
-đều phải đi qua đây; xem lý do trong docs/environment.md.
+Package ``gamerecsys`` tự import module này, nên mọi module con của dự án đã
+có bản vá trước khi import ``recbole``. Code ngoài package (notebook, script rời)
+phải ``import gamerecsys`` trước ``recbole``. Lý do chọn: docs/environment.md.
 
 - numpy 2 đã xoá ``np.float_``, ``np.complex_``, ``np.unicode_``, mà RecBole gán
   lại chúng khi tạo Config, nên ta trả lại các tên đó trước.
@@ -12,7 +13,7 @@ Import module này TRƯỚC mọi module ``recbole``. Mọi code trong dự án 
 
 import os
 
-os.environ.setdefault("TORCH_FORCE_NO_WEIGHTS_ONLY_LOAD", "1")
+os.environ["TORCH_FORCE_NO_WEIGHTS_ONLY_LOAD"] = "1"
 
 import numpy as np  # noqa: E402
 
