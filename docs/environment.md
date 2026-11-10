@@ -45,8 +45,9 @@ Nếu pip đổi phiên bản numpy hoặc các thư viện Kaggle đã nạp s�
 **Không** cài `requirements-torch-cpu.txt` trên Kaggle, vì sẽ đè mất torch GPU có sẵn.
 
 **Đã thử trên Kaggle (2026-11-10).**
-- Kaggle chạy **Python 3.13**. Cài đặt thành công và smoke test chạy OK, nhưng lần đó notebook **chưa bật GPU** nên chỉ chạy trên CPU. Phần GPU vẫn chưa kiểm chứng.
-- Smoke test giờ in ra thiết bị thật, và dừng với lỗi nếu gọi `--gpu` mà không có CUDA.
+- Kaggle chạy **Python 3.13**, Accelerator GPU T4 x2. Cài đặt thành công, smoke test `--gpu` chạy OK trên **`cuda:0`**.
+- Smoke test in ra thiết bị thật, và dừng với lỗi nếu gọi `--gpu` mà không có CUDA.
+- Dòng `cudart_stub.cc ... Could not find cuda drivers on your machine, GPU will not be used` là của **TensorFlow** (có sẵn trên Kaggle), không liên quan tới torch hay RecBole. Bỏ qua được.
 - Khi cài, pip báo `dependency conflicts` với các thư viện Kaggle có sẵn mà dự án không dùng (numba, cudf, ydata-profiling, gradio, bigframes…). Các cảnh báo này **bỏ qua được**.
 
 ## Lý do chọn phiên bản
