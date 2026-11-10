@@ -218,3 +218,19 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# --- GameRecSys ---
+# Dữ liệu (mẫu thô thu nhỏ, processed): không commit
+data/*
+!data/.gitkeep
+# Artifacts nặng (embedding, checkpoint, top-K); chỉ giữ bảng kết quả chung
+artifacts/*
+!artifacts/.gitkeep
+!artifacts/results.csv
+# Ảnh bìa tải sẵn cho demo
+app/assets/*
+!app/assets/.gitkeep
+# Thư mục RecBole tự tạo khi chạy
+saved/
+log/
+log_tensorboard/

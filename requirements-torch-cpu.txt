@@ -1,0 +1,3 @@
+# Chỉ dùng trên laptop (CPU). Kaggle dùng torch GPU có sẵn, KHÔNG cài file này trên Kaggle.
+--index-url https://download.pytorch.org/whl/cpu
+torch==2.8.0

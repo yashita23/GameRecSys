@@ -195,7 +195,8 @@ Thiết kế để người không chơi game (kể cả giảng viên) vẫn hi
 GameRecSys/
 ├── data/               # mẫu thô thu nhỏ, processed — không commit
 ├── configs/            # cấu hình RecBole và mô hình riêng
-├── src/
+├── src/gamerecsys/     # package của dự án (pip install -e .)
+│   ├── recbole_compat.py  # import trước mọi module recbole (docs/environment.md)
 │   ├── data/           # lọc k-core, bốc mẫu, sắp chuỗi, thiết lập A và B, tập độ vững
 │   ├── eval/           # Recall, NDCG, HitRate, Neg@10, độ đa dạng (dùng chung)
 │   ├── experiments/    # script chạy nhiều seed, ghi artifacts/results.csv
@@ -213,7 +214,8 @@ GameRecSys/
 ├── docs/adr/           # các quyết định khó đảo ngược
 ├── GLOSSARY.md
 ├── PLAN.md
-├── requirements.txt
+├── requirements*.txt   # torch CPU (laptop), thư viện chung, RecBole --no-deps
+├── pyproject.toml
 └── README.md
 ```
 

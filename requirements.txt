@@ -1,0 +1,40 @@
+# Thư viện của dự án, ghi cố định phiên bản. Cách cài và lý do: docs/environment.md
+#
+# KHÔNG có torch ở đây:
+#   - Laptop: cài torch CPU trước bằng requirements-torch-cpu.txt
+#   - Kaggle: dùng torch GPU có sẵn của Kaggle, không cài đè
+# KHÔNG có recbole ở đây: cài riêng bằng `pip install --no-deps -r requirements-recbole.txt`
+# (RecBole đòi ray<=2.6.3, không có cho Python mới và dự án không dùng tới).
+
+# Dữ liệu và tính toán
+numpy==2.4.6
+pandas==2.3.3          # pandas 3 làm RecBole bỏ qua fillna (copy-on-write), không được nâng
+scipy==1.17.1
+scikit-learn==1.9.1
+polars==2.1.0
+pyarrow==26.0.1
+
+# M3: embedding nội dung
+sentence-transformers==6.2.0
+transformers==5.22.2
+
+# Demo
+streamlit==1.67.0
+plotly==7.1.0
+
+# Test
+pytest==9.2.0
+
+# Các phụ thuộc RecBole 1.2.1 cần (trừ ray)
+tqdm==4.70.1
+colorlog==4.7.2
+colorama==0.4.4
+PyYAML==6.0.3
+tensorboard==2.21.0
+thop==0.1.1.post2209072238
+tabulate==0.10.0
+texttable==1.7.2
+psutil==7.2.2
+
+# Package của dự án (src/gamerecsys), cài editable
+-e .
