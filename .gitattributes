@@ -1,0 +1,6 @@
+# Thống nhất xuống dòng LF trong repo (Windows checkout vẫn dùng được)
+* text=auto eol=lf
+*.bat text eol=crlf
+*.png binary
+*.jpg binary
+*.zip binary
